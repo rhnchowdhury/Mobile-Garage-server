@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 const app = express();
@@ -16,41 +16,25 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run() {
     try {
-        const iPhoneCollection = client.db('mobileGarage').collection('iPhone');
-        const onePlusCollection = client.db('mobileGarage').collection('onePlus');
-        const xiaomiCollection = client.db('mobileGarage').collection('xiaomi');
+        const phoneCollection = client.db('mobileGarage').collection('phones');
+        const bookingCollection = client.db('mobileGarage').collection('booking');
 
-        // iphone data create
-        app.get('/iphone', async (req, res) => {
+        // phone data create
+        app.get('/phone', async (req, res) => {
             const query = {};
-            // const cursor = iPhoneCollection.find(query).limit(2)
-            // const options = await cursor.toArray();
-            const options1 = await iPhoneCollection.find(query).limit(2).toArray();
-            res.send(options1);
-        });
-        // app.get('/iphone', async (req, res) => {
-        //     const query = {};
-        //     const options = await iPhoneCollection.find(query).toArray();
-        //     res.send(options);
-        // })
-
-        // onePlus data created
-        app.get('/plus', async (req, res) => {
-            const query = {};
-            // const cursor = onePlusCollection.find(query).limit(2)
-            // const options = await cursor.toArray();
-            const options2 = await onePlusCollection.find(query).limit(2).toArray();
-            res.send(options2);
+            const cursor = phoneCollection.find(query)
+            const options = await cursor.toArray();
+            // const options1 = await iPhoneCollection.find(query).limit(2).toArray();
+            res.send(options);
         });
 
-        // xiaomi data created
-        app.get('/xiaomi', async (req, res) => {
-            const query = {};
-            // const cursor = iPhoneCollection.find(query).limit(2)
-            // const options = await cursor.toArray();
-            const options3 = await xiaomiCollection.find(query).limit(2).toArray();
-            res.send(options3);
-        });
+        // booking add
+        app.post('/booking', async (req, res) => {
+            const booking = req.body;
+            console.log(booking)
+            const result = await bookingCollection.insertOne(booking);
+            res.send(result)
+        })
 
     }
     finally {
