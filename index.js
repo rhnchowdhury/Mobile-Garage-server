@@ -33,7 +33,7 @@ function verifyJWT(req, res, next) {
 async function run() {
     try {
         const phoneCollection = client.db('mobileGarage').collection('phones');
-        // const categoryCollection = client.db('mobileGarage').collection('phoneCategory');
+        const categoryCollection = client.db('mobileGarage').collection('phoneCategory');
         const bookingCollection = client.db('mobileGarage').collection('booking');
         const usersCollection = client.db('mobileGarage').collection('users');
 
@@ -44,12 +44,17 @@ async function run() {
             res.send(options);
         });
 
-
+        // category data created
+        app.get('/phone/:id', async (req, res) => {
+            const phoneId = req.params.id;
+            const query = { category: phoneId };
+            const result = await categoryCollection.find(query).toArray();
+            res.send(result);
+        });
 
         // booking add
         app.post('/booking', async (req, res) => {
             const booking = req.body;
-            console.log(booking)
             const result = await bookingCollection.insertOne(booking);
             res.send(result)
         });
