@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
@@ -19,6 +19,7 @@ async function run() {
     try {
         const phoneCollection = client.db('mobileGarage').collection('phones');
         const bookingCollection = client.db('mobileGarage').collection('booking');
+        const usersCollection = client.db('mobileGarage').collection('users');
 
         // phone data create
         app.get('/phone', async (req, res) => {
@@ -37,13 +38,32 @@ async function run() {
             res.send(result)
         });
 
-        //get booking using email
+        //get booking data using email
         app.get('/booking', async (req, res) => {
             const email = req.query.email;
             const query = { userEmail: email };
             const bookings = await bookingCollection.find(query).toArray();
             res.send(bookings)
-        })
+        });
+
+        // user data create
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user);
+            res.send(result)
+        });
+
+        // jwt token create
+        app.get('/jwt', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const user = await usersCollection.insertOne(query);
+            if (user) {
+                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN);
+                return res.send({ accessToken: token });
+            }
+            res.status(403).send({ accessToken: '' })
+        });
 
     }
     finally {
